@@ -6,7 +6,13 @@ import entity.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import service.ProductService;
 
 import java.util.ArrayList;
@@ -21,35 +27,15 @@ public class ProductController {
         this.service = service;
     }
 
-    public void init() {
-        ApplicationContext context = new AnnotationConfigApplicationContext(Conf.class);
-        Product product1 = context.getBean(Product.class);
-        product1.setId(UUID.randomUUID());
-        product1.setName("product 1");
-        product1.setPrice(15);
 
-        Product product2 = context.getBean(Product.class);
-        product2.setId(UUID.randomUUID());
-        product2.setPrice(12);
-        product2.setName("product 2");
-
-        Product product3 = context.getBean(Product.class);
-        product3.setId(UUID.randomUUID());
-        product3.setPrice(20);
-        product3.setName("product 3");
-        // устал писать))
-        List<Product> productList = new ArrayList<>();
-        productList.add(product1);
-        productList.add(product2);
-        productList.add(product3);
-        Cart cart = context.getBean("cart", Cart.class);
+    @GetMapping("/api/find")
+    public String findAll(Model model, @RequestParam UUID id) {
+        model.addAttribute("itemFront", service.findAllProducts());
+        return "index.html";
     }
 
-    public void findAll() {
-        System.out.println(service.findAllProducts());
-    }
-
-    public void deleteById(UUID id) {
+    @DeleteMapping("/delete/{id}")
+    public void deleteById(@PathVariable("id") UUID id) {
         service.deleteProductById(id);
     }
 
@@ -57,7 +43,8 @@ public class ProductController {
         service.deleteProductsFromCart(id);
     }
 
-    public void saveProductToCart(UUID id) {
+    @GetMapping("/findBy/{id}")
+    public void saveProductToCart(@PathVariable("id") UUID id) {
         service.saveProductToCart(id);
     }
 
